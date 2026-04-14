@@ -375,8 +375,4 @@ MIT License - Uso livre para fins educacionais e profissionais
 
 ## 🎉 PurpleScan v2.0
 
-**Ferramenta brasileira de cibersegurança nível profissional!**
-
-Desenvolvido com ❤️ no Brasil para profissionais de segurança.
-
 **Scanner • Análise • Risco • Dashboard - Tudo em Português!** 🚀
