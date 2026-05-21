@@ -1,0 +1,109 @@
+{
+  "metadata": {
+    "scan_time": "2026-04-19T22:12:00.565527",
+    "scanner": "PurpleScan v2.0",
+    "report_version": "2.0"
+  },
+  "system": {
+    "hostname": "DESKTOP-V7PABJ4",
+    "platform": "Windows",
+    "platform_release": "10",
+    "platform_version": "10.0.19045",
+    "architecture": "AMD64",
+    "processor": "Intel64 Family 6 Model 158 Stepping 10, GenuineIntel",
+    "python_version": "3.11.0",
+    "timestamp": "2026-04-19T22:11:44.942450",
+    "os_name": "Windows 10 Pro",
+    "last_boot": "20260416192333.558542-180"
+  },
+  "security": {
+    "firewall": {
+      "enabled": false,
+      "details": "Unknown",
+      "profiles": {
+        "Domain": "Disabled",
+        "Private": "Disabled",
+        "Public": "Disabled"
+      }
+    },
+    "antivirus": {
+      "enabled": true,
+      "name": "Windows Defender",
+      "details": "Real-time protection enabled"
+    },
+    "disk_encryption": {
+      "enabled": false,
+      "type": "None",
+      "details": "No encryption detected"
+    },
+    "scan_time": "2026-04-19T22:11:52.978784"
+  },
+  "network": {
+    "127.0.0.1/32": [
+      {
+        "port": 135,
+        "service": "RPC",
+        "banner": "No banner",
+        "status": "open"
+      },
+      {
+        "port": 135,
+        "service": "RPC",
+        "banner": "No banner",
+        "status": "open"
+      },
+      {
+        "port": 445,
+        "service": "SMB",
+        "banner": "No banner",
+        "status": "open"
+      },
+      {
+        "port": 445,
+        "service": "SMB",
+        "banner": "No banner",
+        "status": "open"
+      }
+    ]
+  },
+  "risks": {
+    "critical": [
+      "Firewall is disabled - system exposed to network attacks"
+    ],
+    "high": [
+      "High-risk service exposed: RPC on 127.0.0.1/32:135",
+      "High-risk service exposed: RPC on 127.0.0.1/32:135",
+      "High-risk service exposed: SMB on 127.0.0.1/32:445",
+      "High-risk service exposed: SMB on 127.0.0.1/32:445"
+    ],
+    "medium": [
+      "Disk encryption not enabled - data at risk if device lost"
+    ],
+    "low": [
+      "Antivirus active: Windows Defender"
+    ],
+    "info": []
+  },
+  "risk_score": 96,
+  "summary": {
+    "total_hosts_scanned": 1,
+    "total_open_ports": 4,
+    "unique_services": 2,
+    "top_services": {
+      "RPC": 2,
+      "SMB": 2
+    },
+    "security_status": {
+      "firewall_enabled": false,
+      "antivirus_enabled": true,
+      "encryption_enabled": false
+    },
+    "risk_distribution": {
+      "critical": 1,
+      "high": 4,
+      "medium": 1,
+      "low": 1,
+      "info": 0
+    }
+  }
+}

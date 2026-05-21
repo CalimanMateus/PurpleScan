@@ -1,0 +1,524 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>PurpleScan - Dashboard de Segurança</title>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+        
+        body {
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+            background: linear-gradient(135deg, #0a0a14 0%, #1a1a2e 100%);
+            color: #e0e0e0;
+            min-height: 100vh;
+        }
+        
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+            padding: 20px;
+            background: rgba(187, 134, 252, 0.1);
+            border-radius: 15px;
+            border: 1px solid rgba(187, 134, 252, 0.3);
+        }
+        
+        .header h1 {
+            color: #bb86fc;
+            font-size: 2.5em;
+            margin-bottom: 10px;
+            text-shadow: 0 0 20px rgba(187, 134, 252, 0.5);
+        }
+        
+        .header p {
+            color: #aaa;
+            font-size: 1.1em;
+        }
+        
+        .risk-score {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .score-display {
+            display: inline-block;
+            padding: 30px 50px;
+            background: #2d0000;
+            border: 2px solid #ff4d4d;
+            border-radius: 20px;
+            box-shadow: 0 0 30px rgba(0, 0, 0, 0.5);
+        }
+        
+        .score-number {
+            font-size: 4em;
+            font-weight: bold;
+            color: #ff4d4d;
+            margin-bottom: 10px;
+        }
+        
+        .score-label {
+            font-size: 1.5em;
+            color: #ff4d4d;
+        }
+        
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 20px;
+            margin-bottom: 30px;
+        }
+        
+        .card {
+            background: rgba(30, 30, 50, 0.8);
+            border: 1px solid rgba(187, 134, 252, 0.2);
+            border-radius: 15px;
+            padding: 25px;
+            box-shadow: 0 8px 32px rgba(0, 0, 0, 0.3);
+            backdrop-filter: blur(10px);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 12px 40px rgba(0, 0, 0, 0.4);
+        }
+        
+        .card h2 {
+            color: #bb86fc;
+            margin-bottom: 20px;
+            font-size: 1.5em;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        
+        .status-indicator {
+            display: inline-block;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        
+        .status-enabled {
+            background: #66ff99;
+            box-shadow: 0 0 10px #66ff99;
+        }
+        
+        .status-disabled {
+            background: #ff4d4d;
+            box-shadow: 0 0 10px #ff4d4d;
+        }
+        
+        .risk-item {
+            padding: 8px 12px;
+            margin: 5px 0;
+            border-radius: 8px;
+            border-left: 4px solid;
+        }
+        
+        .risk-critical {
+            background: rgba(255, 77, 77, 0.1);
+            border-color: #ff4d4d;
+        }
+        
+        .risk-high {
+            background: rgba(255, 140, 0, 0.1);
+            border-color: #ff8c00;
+        }
+        
+        .risk-medium {
+            background: rgba(255, 214, 51, 0.1);
+            border-color: #ffd633;
+        }
+        
+        .risk-low {
+            background: rgba(102, 255, 153, 0.1);
+            border-color: #66ff99;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            margin-top: 20px;
+        }
+        
+        .network-item {
+            padding: 10px;
+            margin: 5px 0;
+            background: rgba(187, 134, 252, 0.05);
+            border-radius: 8px;
+            border-left: 3px solid #bb86fc;
+        }
+        
+        .port-info {
+            font-family: 'Courier New', monospace;
+            font-size: 0.9em;
+            color: #aaa;
+        }
+        
+        .summary-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-item {
+            text-align: center;
+            padding: 15px;
+            background: rgba(187, 134, 252, 0.1);
+            border-radius: 10px;
+        }
+        
+        .stat-number {
+            font-size: 2em;
+            font-weight: bold;
+            color: #bb86fc;
+        }
+        
+        .stat-label {
+            color: #aaa;
+            font-size: 0.9em;
+        }
+        
+        .export-buttons {
+            text-align: center;
+            margin-top: 30px;
+        }
+        
+        .btn {
+            background: linear-gradient(45deg, #bb86fc, #7b2cbf);
+            color: white;
+            border: none;
+            padding: 12px 25px;
+            margin: 0 10px;
+            border-radius: 25px;
+            cursor: pointer;
+            font-size: 1em;
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 20px rgba(187, 134, 252, 0.4);
+        }
+        
+        .banner {
+            background: linear-gradient(45deg, #ff4d4d, #ff8c00, #ffd633);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            font-weight: bold;
+        }
+        
+        @media (max-width: 768px) {
+            .grid {
+                grid-template-columns: 1fr;
+            }
+            .container {
+                padding: 10px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1> PurpleScan Dashboard de Segurança</h1>
+            <p>Relatório Avançado de Avaliação de Vulnerabilidades</p>
+            <p><small>Gerado: 2026-04-19 22:12:00</small></p>
+        </div>
+
+        <div class="risk-score">
+            <div class="score-display">
+                <div class="score-number">96</div>
+                <div class="score-label">CRITICAL RISK</div>
+            </div>
+        </div>
+
+        <div class="grid">
+            <div class="card">
+                <h2> Informações do Sistema</h2>
+                <p><strong>Hostname:</strong> DESKTOP-V7PABJ4</p>
+                <p><strong>Plataforma:</strong> Windows 10</p>
+                <p><strong>Arquitetura:</strong> AMD64</p>
+                <p><strong>Sistema Operacional:</strong> Windows 10 Pro</p>
+            </div>
+
+            <div class="card">
+                <h2> Status de Segurança</h2>
+                <p>
+                    <span class="status-indicator status-disabled"></span>
+                    <strong>Firewall:</strong> Unknown
+                </p>
+                <p>
+                    <span class="status-indicator status-enabled"></span>
+                    <strong>Antivírus:</strong> Windows Defender
+                </p>
+                <p>
+                    <span class="status-indicator status-disabled"></span>
+                    <strong>Criptografia:</strong> None
+                </p>
+            </div>
+
+            <div class="card">
+                <h2> Análise de Risco</h2>
+                <div class="chart-container">
+                    <canvas id="riskChart"></canvas>
+                </div>
+                <div style="margin-top: 20px;">
+                    <div class='risk-item risk-critical'><strong>CRÍTICO (1):</strong><ul><li>Firewall is disabled - system exposed to network attacks</li></ul></div><div class='risk-item risk-high'><strong>ALTO (4):</strong><ul><li>High-risk service exposed: RPC on 127.0.0.1/32:135</li><li>High-risk service exposed: RPC on 127.0.0.1/32:135</li><li>High-risk service exposed: SMB on 127.0.0.1/32:445</li><li>High-risk service exposed: SMB on 127.0.0.1/32:445</li></ul></div><div class='risk-item risk-medium'><strong>MÉDIO (1):</strong><ul><li>Disk encryption not enabled - data at risk if device lost</li></ul></div><div class='risk-item risk-low'><strong>BAIXO (1):</strong><ul><li>Antivirus active: Windows Defender</li></ul></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <h2> Resumo da Rede</h2>
+                <div class="summary-stats">
+                    <div class="stat-item">
+                        <div class="stat-number">1</div>
+                        <div class="stat-label">Hosts</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">4</div>
+                        <div class="stat-label">Portas Abertas</div>
+                    </div>
+                    <div class="stat-item">
+                        <div class="stat-number">2</div>
+                        <div class="stat-label">Serviços</div>
+                    </div>
+                </div>
+                <div class="chart-container">
+                    <canvas id="serviceChart"></canvas>
+                </div>
+            </div>
+
+            <div class="card" style="grid-column: 1 / -1;">
+                <h2> Detalhes da Rede</h2>
+                <div class='network-item'><strong>127.0.0.1/32</strong><br><div class='port-info'>135/RPC - No banner</div><div class='port-info'>135/RPC - No banner</div><div class='port-info'>445/SMB - No banner</div><div class='port-info'>445/SMB - No banner</div></div>
+            </div>
+        </div>
+
+        <div class="export-buttons">
+            <button class="btn" onclick="exportJSON()">Exportar JSON</button>
+            <button class="btn" onclick="window.print()">Imprimir Relatório</button>
+            <button class="btn" onclick="location.reload()">Atualizar</button>
+        </div>
+    </div>
+
+    <script>
+        // Risk Distribution Chart
+        const riskCtx = document.getElementById('riskChart').getContext('2d');
+        const riskChart = new Chart(riskCtx, {
+            type: 'doughnut',
+            data: {
+                labels: ['Crítico', 'Alto', 'Médio', 'Baixo', 'Info'],
+                datasets: [{
+                    data: [
+                        1,
+                        4,
+                        1,
+                        1,
+                        0
+                    ],
+                    backgroundColor: ['#ff4d4d', '#ff8c00', '#ffd633', '#66ff99', '#66d9ff'],
+                    borderWidth: 0
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'bottom',
+                        labels: {
+                            color: '#e0e0e0'
+                        }
+                    }
+                }
+            }
+        });
+
+        // Services Chart
+        const serviceCtx = document.getElementById('serviceChart').getContext('2d');
+        const serviceChart = new Chart(serviceCtx, {
+            type: 'bar',
+            data: {
+                labels: ['RPC', 'SMB'],
+                datasets: [{
+                    label: 'Contagem de Serviços',
+                    data: [2, 2],
+                    backgroundColor: 'rgba(187, 134, 252, 0.6)',
+                    borderColor: '#bb86fc',
+                    borderWidth: 1
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                scales: {
+                    y: {
+                        beginAtZero: true,
+                        ticks: {
+                            color: '#e0e0e0'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    },
+                    x: {
+                        ticks: {
+                            color: '#e0e0e0'
+                        },
+                        grid: {
+                            color: 'rgba(255, 255, 255, 0.1)'
+                        }
+                    }
+                },
+                plugins: {
+                    legend: {
+                        display: false
+                    }
+                }
+            }
+        });
+
+        // Export functions
+        function exportJSON() {
+            const data = {
+  "metadata": {
+    "scan_time": "2026-04-19T22:12:00.565527",
+    "scanner": "PurpleScan v2.0",
+    "report_version": "2.0"
+  },
+  "system": {
+    "hostname": "DESKTOP-V7PABJ4",
+    "platform": "Windows",
+    "platform_release": "10",
+    "platform_version": "10.0.19045",
+    "architecture": "AMD64",
+    "processor": "Intel64 Family 6 Model 158 Stepping 10, GenuineIntel",
+    "python_version": "3.11.0",
+    "timestamp": "2026-04-19T22:11:44.942450",
+    "os_name": "Windows 10 Pro",
+    "last_boot": "20260416192333.558542-180"
+  },
+  "security": {
+    "firewall": {
+      "enabled": false,
+      "details": "Unknown",
+      "profiles": {
+        "Domain": "Disabled",
+        "Private": "Disabled",
+        "Public": "Disabled"
+      }
+    },
+    "antivirus": {
+      "enabled": true,
+      "name": "Windows Defender",
+      "details": "Real-time protection enabled"
+    },
+    "disk_encryption": {
+      "enabled": false,
+      "type": "None",
+      "details": "No encryption detected"
+    },
+    "scan_time": "2026-04-19T22:11:52.978784"
+  },
+  "network": {
+    "127.0.0.1/32": [
+      {
+        "port": 135,
+        "service": "RPC",
+        "banner": "No banner",
+        "status": "open"
+      },
+      {
+        "port": 135,
+        "service": "RPC",
+        "banner": "No banner",
+        "status": "open"
+      },
+      {
+        "port": 445,
+        "service": "SMB",
+        "banner": "No banner",
+        "status": "open"
+      },
+      {
+        "port": 445,
+        "service": "SMB",
+        "banner": "No banner",
+        "status": "open"
+      }
+    ]
+  },
+  "risks": {
+    "critical": [
+      "Firewall is disabled - system exposed to network attacks"
+    ],
+    "high": [
+      "High-risk service exposed: RPC on 127.0.0.1/32:135",
+      "High-risk service exposed: RPC on 127.0.0.1/32:135",
+      "High-risk service exposed: SMB on 127.0.0.1/32:445",
+      "High-risk service exposed: SMB on 127.0.0.1/32:445"
+    ],
+    "medium": [
+      "Disk encryption not enabled - data at risk if device lost"
+    ],
+    "low": [
+      "Antivirus active: Windows Defender"
+    ],
+    "info": []
+  },
+  "risk_score": 96,
+  "summary": {
+    "total_hosts_scanned": 1,
+    "total_open_ports": 4,
+    "unique_services": 2,
+    "top_services": {
+      "RPC": 2,
+      "SMB": 2
+    },
+    "security_status": {
+      "firewall_enabled": false,
+      "antivirus_enabled": true,
+      "encryption_enabled": false
+    },
+    "risk_distribution": {
+      "critical": 1,
+      "high": 4,
+      "medium": 1,
+      "low": 1,
+      "info": 0
+    }
+  }
+};
+            const blob = new Blob([data], {type: 'application/json'});
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = 'purplescan_report.json';
+            a.click();
+        }
+
+        // Auto-refresh every 5 minutes
+        setTimeout(() => {
+            console.log('Dashboard ready');
+        }, 1000);
+    </script>
+</body>
+</html>
+        

@@ -39,7 +39,7 @@ Ferramenta brasileira de cibersegurança para análise de vulnerabilidades de re
 ### Instalação Rápida
 ```bash
 # 1. Clonar ou baixar os arquivos
-git clone https://github.com/purplescan/purplescan.git
+git clone 
 cd purplescan
 
 # 2. Instalar dependências
